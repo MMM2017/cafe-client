@@ -13,6 +13,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.ArrayAdapter;
+import android.widget.GridView;
 
 public class OfficiantActivity extends AppCompatActivity
 		implements NavigationView.OnNavigationItemSelectedListener
@@ -34,6 +36,12 @@ public class OfficiantActivity extends AppCompatActivity
 
 		NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
 		navigationView.setNavigationItemSelectedListener(this);
+
+		String[] cats = new String[] { "First course", "Second course", "Drinks", "Desserts" };
+		ArrayAdapter<String> adapter =
+				new ArrayAdapter<>(this, R.layout.menu_category_view, R.id.menuCategoryLabel, cats);
+		 GridView catsView = (GridView) findViewById(R.id.menuCatsGridView);
+		 catsView.setAdapter(adapter);
 	}
 
 	@Override

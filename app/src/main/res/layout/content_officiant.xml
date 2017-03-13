@@ -22,7 +22,8 @@
     <GridView
             android:layout_height="match_parent"
             android:layout_centerHorizontal="true" android:layout_below="@+id/searchView"
-            android:layout_width="match_parent">
+            android:layout_width="match_parent"
+            android:id="@+id/menuCatsGridView" android:numColumns="2">
 
     </GridView>
 </RelativeLayout>
