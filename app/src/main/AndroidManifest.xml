@@ -23,7 +23,7 @@
             </intent-filter>
         </activity>
         <activity
-                android:name=".OfficiantActivity"
+                android:name=".WaiterActivity"
                 android:label="@string/title_activity_officiant"
                 android:theme="@style/AppTheme.NoActionBar">
         </activity>
