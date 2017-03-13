@@ -3,6 +3,7 @@ package ru.lazycodersinc.smartcafeclient;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.app.LoaderManager.LoaderCallbacks;
 
@@ -264,8 +265,11 @@ public class LoginActivity extends AppCompatActivity //implements LoaderCallback
 
 			if (success)
 			{
-				// TODO: open next activity
-				finish();
+				// TODO: open activity corresponding to user type
+				// finish();
+				Intent i = new Intent(LoginActivity.this, OfficiantActivity.class);
+				i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+				LoginActivity.this.startActivity(i);
 			}
 			else
 			{
