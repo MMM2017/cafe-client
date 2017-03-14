@@ -1,6 +1,7 @@
 package ru.lazycodersinc.smartcafeclient.network;
 
 import ru.lazycodersinc.smartcafeclient.model.Dish;
+import ru.lazycodersinc.smartcafeclient.model.Order;
 import ru.lazycodersinc.smartcafeclient.model.User;
 
 /**
@@ -52,5 +53,12 @@ public class NetworkManager
 	public Dish[] listMenu()
 	{
 		return listMenu(new MenuSearchQuery());
+	}
+
+	// orders
+
+	public Order[] listActiveOrders()
+	{
+		return new Order[0];
 	}
 }
