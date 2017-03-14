@@ -20,6 +20,8 @@ import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import ru.lazycodersinc.smartcafeclient.model.AppState;
+import ru.lazycodersinc.smartcafeclient.model.FailableActionListener;
 
 import java.util.List;
 
@@ -99,7 +101,7 @@ public class LoginActivity extends AppCompatActivity //implements LoaderCallback
 		mPasswordView.setError(null);
 
 		// Store values at the time of the login attempt.
-		String email = mEmailView.getText().toString();
+		String login = mEmailView.getText().toString();
 		String password = mPasswordView.getText().toString();
 
 		boolean cancel = false;
@@ -114,13 +116,13 @@ public class LoginActivity extends AppCompatActivity //implements LoaderCallback
 		}
 
 		// Check for a valid email address.
-		if (TextUtils.isEmpty(email))
+		if (TextUtils.isEmpty(login))
 		{
 			mEmailView.setError(getString(R.string.error_field_required));
 			focusView = mEmailView;
 			cancel = true;
 		}
-		else if (!isLoginValid(email))
+		else if (!isLoginValid(login))
 		{
 			mEmailView.setError(getString(R.string.error_invalid_email));
 			focusView = mEmailView;
@@ -138,8 +140,39 @@ public class LoginActivity extends AppCompatActivity //implements LoaderCallback
 			// Show a progress spinner, and kick off a background task to
 			// perform the user login attempt.
 			showProgress(true);
-			mAuthTask = new UserLoginTask(email, password);
-			mAuthTask.execute((Void) null);
+//			mAuthTask = new UserLoginTask(email, password);
+//			mAuthTask.execute((Void) null);
+			AppState.logIn(login, password, new FailableActionListener()
+			{
+				@Override
+				public void onSuccess(Object... params)
+				{
+					Intent i = new Intent(LoginActivity.this, WaiterActivity.class);
+					i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+					LoginActivity.this.startActivity(i);
+				}
+
+				@Override
+				public void onError(Object... params)
+				{
+					showProgress(false);
+					int code = (int) params[0];
+					if (code == 401)
+					{
+						// 401 Unauthorized => incorrect password
+						mPasswordView.setError(getString(R.string.error_incorrect_password));
+						mPasswordView.requestFocus();
+					}
+					if (code == 0)
+					{
+						mEmailView.setError("Offline");
+					}
+					if (code == -1)
+					{
+						mEmailView.setError("Internal error");
+					}
+				}
+			});
 		}
 	}
 

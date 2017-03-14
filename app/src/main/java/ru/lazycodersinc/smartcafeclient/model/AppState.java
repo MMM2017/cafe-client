@@ -1,24 +1,35 @@
 package ru.lazycodersinc.smartcafeclient.model;
 
-import java.util.Dictionary;
+import org.json.JSONException;
+import org.json.JSONObject;
+import ru.lazycodersinc.smartcafeclient.network.ApiCallListener;
+import ru.lazycodersinc.smartcafeclient.network.ApiCallResult;
+import ru.lazycodersinc.smartcafeclient.network.NetworkManager;
+
+import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 /**
- * Class provides static info about application state
+ * Class provides static info about application state.
+ * Class serves as central point to perform any operations on data.
  */
 public class AppState
 {
+	public static String getAppVersion() { return "SmartCafe client v. 0.1.0"; }
+
 	private static User loggedInAs;
 	public static boolean isLoggedIn() { return loggedInAs == null; }
 
-	public static void loggedIn(User as) { loggedInAs = as; }
+	public static User currentUser() { return loggedInAs; }
 
+	//
 	// registries
-	public static Map<Integer, Order> ordersRegistry;
-	public static Map<Integer, Notification> notificationsRegistry;
-	public static Map<Integer, User> usersRegistry;
+	//
+
+	private static Map<Integer, Order> ordersRegistry;
+	private static Map<Integer, Notification> notificationsRegistry;
+	private static Map<Integer, User> usersRegistry;
 
 	static
 	{
@@ -27,11 +38,74 @@ public class AppState
 		usersRegistry = new HashMap<>();
 	}
 
-	public static Order registerOrder(int id, Order content)
+	private static Order registerOrder(int id, Order content)
 	{
 		if (ordersRegistry.containsKey(id))
 			return ordersRegistry.get(id);
 		ordersRegistry.put(id, content);
 		return content;
+	}
+
+	private static void gcOrders()
+	{
+		// wiping away all closed and therefore not relevant orders
+		ArrayList<Integer> closed = new ArrayList<>();
+		for (Integer id: ordersRegistry.keySet())
+		{
+			Order val = ordersRegistry.get(id);
+			if (val.getOrderState() == Order.State.CLOSED)
+			{
+				closed.add(id);
+			}
+		}
+
+		for (Integer rem: closed)
+		{
+			ordersRegistry.remove(rem);
+		}
+	}
+
+	//
+	// data manipulation
+	//
+
+	private static NetworkManager net = new NetworkManager("fake");
+
+	public static void logIn(final String username, String password, final FailableActionListener l)
+	{
+		JSONObject data = new JSONObject();
+		try
+		{
+			data.put("login", username);
+			data.put("password", password);
+		}
+		catch (JSONException e)
+		{
+			e.printStackTrace();
+			l.onError(ApiCallResult.STATUS_UNDEFINED, e);
+			return;
+		}
+		net.post("/auth", data, new ApiCallListener()
+		{
+			@Override
+			public void onResult(ApiCallResult data)
+			{
+				if (data.isOk())
+				{
+					// use result to record current user data
+					// TODO
+					loggedInAs = new User();
+					loggedInAs.login = username;
+					loggedInAs.role = User.Role.WAITER;
+					// TODO: set auth token to net
+				}
+				if (l == null) return;
+
+				if (data.isOk())
+					l.onSuccess(data.result);
+				else
+					l.onError(data.status, data.result);
+			}
+		});
 	}
 }

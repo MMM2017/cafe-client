@@ -7,10 +7,12 @@ public class Notification
 {
 	public String text;
 	public Order relatedTo;
+	public boolean read;
 
 	public Notification(String message, Order related)
 	{
 		text = message;
 		relatedTo = related;
+		read = false;
 	}
 }

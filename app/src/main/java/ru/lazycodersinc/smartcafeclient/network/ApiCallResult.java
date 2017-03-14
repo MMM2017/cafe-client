@@ -18,5 +18,9 @@ public class ApiCallResult
 
 	public boolean isOffline() { return status == 0; }
 
-	public static final ApiCallResult OFFLINE = new ApiCallResult(0);
+	public boolean isOk() { return status >= 200 && status < 300; }
+
+	public static final int STATUS_OFFLINE = 0;
+	public static final int STATUS_UNDEFINED = -1;
+	public static final ApiCallResult OFFLINE = new ApiCallResult(STATUS_OFFLINE);
 }

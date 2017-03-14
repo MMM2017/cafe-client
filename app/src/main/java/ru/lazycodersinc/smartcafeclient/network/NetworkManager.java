@@ -40,7 +40,7 @@ public class NetworkManager
 	public void send(String method, String endpoint, Object data, ApiCallListener listener)
 	{
 		String url = apiPrefix + endpoint;
-		new ApiCallTask().execute(method, url, listener, data);
+		new ApiCallTask().execute(method, url, data, listener);
 	}
 	public void get(String endpoint, ApiCallListener listener)
 	{
@@ -71,6 +71,16 @@ public class NetworkManager
 			String endpoint = (String) apiCallParams[1];
 			Object data = apiCallParams[2];
 			listener = (ApiCallListener) apiCallParams[3];
+
+			if (endpoint.startsWith("fake"))
+			{
+				try
+				{
+					Thread.sleep(1000);
+				}
+				catch (InterruptedException ex) {}
+				return new ApiCallResult(200);
+			}
 
 			try
 			{
