@@ -8,8 +8,7 @@ public class Dish
 	public Type type;
 	public String name;
 	public String description;
-	public float portionSize;
-	public String portionUnit;
+	public String quantity;
 
 	public enum Type
 	{

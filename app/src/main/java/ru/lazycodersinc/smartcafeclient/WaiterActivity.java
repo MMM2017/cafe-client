@@ -139,15 +139,15 @@ public class WaiterActivity extends AppCompatActivity
 			case MENU_LIST:
 				ArrayList<Dish> test = new ArrayList<>();
 				Dish d = new Dish();
-				d.name = "Apple"; d.portionSize = 1; d.portionUnit = "unit";
+				d.name = "Apple"; d.quantity= "1 unit";
 				test.add(d);
 
 				d = new Dish();
-				d.name = "Potato"; d.portionSize = 1; d.portionUnit = "kg";
+				d.name = "Potato"; d.quantity= "1 kg";
 				test.add(d);
 
 				d = new Dish();
-				d.name = "Soup"; d.portionSize = 1; d.portionUnit = "vedro";
+				d.name = "Soup"; d.quantity= "1 vedro";
 				test.add(d);
 
 				MenuAdapter menuAdapter = new MenuAdapter(this, to.layoutId, test);

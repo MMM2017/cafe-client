@@ -9,4 +9,5 @@ public class User
 
 	public Role role;
 	public String login;
+	public String name;
 }

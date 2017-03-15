@@ -10,6 +10,7 @@ public class Order
 {
 	public List<Entry> entries;
 	public String comment;
+	public String table;
 
 	public Order()
 	{
