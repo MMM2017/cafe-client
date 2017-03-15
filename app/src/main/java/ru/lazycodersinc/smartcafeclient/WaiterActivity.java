@@ -127,6 +127,17 @@ public class WaiterActivity extends AppCompatActivity
 
 			case R.id.nav_menu:
 				switchLayout(SubLayout.MENU_LIST);
+				break;
+
+			case R.id.nav_notifications:
+				switchLayout(SubLayout.NOTIFICATIONS);
+				break;
+
+			case R.id.nav_make_order:
+				break;
+
+			case R.id.nav_orders:
+				break;
 		}
 
 		DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -195,6 +206,14 @@ public class WaiterActivity extends AppCompatActivity
 				});
 				ListView list = (ListView) findViewById(R.id.menuListView);
 				list.setAdapter(menuAdapter);
+				list.setEmptyView(findViewById(R.id.noDishesMessage));
+
+				break;
+
+			case NOTIFICATIONS:
+
+				ListView notiesList = (ListView) findViewById(R.id.notificationsListView);
+				notiesList.setEmptyView(findViewById(R.id.noNotificationsMessage));
 
 				break;
 		}
@@ -211,7 +230,7 @@ public class WaiterActivity extends AppCompatActivity
 		CATEGORIES(R.layout.menu_cat_view_layout),
 		MENU_LIST(R.layout.menu_list_view_layout),
 		ORDERS_LIST(0),
-		NOTIFICATIONS(0);
+		NOTIFICATIONS(R.layout.notifications_view_layout);
 
 		public int layoutId;
 
