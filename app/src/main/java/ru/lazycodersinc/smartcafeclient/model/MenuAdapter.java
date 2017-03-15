@@ -22,6 +22,9 @@ public class MenuAdapter extends BaseAdapter
 	private MenuSearchQuery filter;
 	private Context ctx;
 
+	private OnItemClickListener icl;
+	private OnItemButtonClickListener ibcl;
+
 	public MenuAdapter(Context context, List<Dish> objects)
 	{
 		ctx = context;
@@ -29,6 +32,16 @@ public class MenuAdapter extends BaseAdapter
 		filter = MenuSearchQuery.identity;
 		applyFilter();
 		notifyDataSetChanged();
+	}
+
+	public void setOnItemClickListener(OnItemClickListener listener)
+	{
+		icl = listener;
+	}
+
+	public void setOnItemButtonClickListener(OnItemButtonClickListener listener)
+	{
+		ibcl = listener;
 	}
 
 	@Override
@@ -50,7 +63,7 @@ public class MenuAdapter extends BaseAdapter
 	}
 
 	@Override
-	public View getView(int position, View convertView, ViewGroup parent)
+	public View getView(final int position, View convertView, final ViewGroup parent)
 	{
 		View v = convertView;
 
@@ -68,9 +81,26 @@ public class MenuAdapter extends BaseAdapter
 			ImageButton addBtn = (ImageButton) v.findViewById(R.id.orderDishButton);
 
 			name.setText(d.name);
-			portion.setText((d.price / 100F) + " RUB / " + d.quantity);
+			portion.setText(d.getQuantityString());
 
-			// TODO: update callbacks
+			addBtn.setOnClickListener(new View.OnClickListener()
+			{
+				@Override
+				public void onClick(View view)
+				{
+					ibcl.onItemButtonClick(position, MenuAdapter.this);
+				}
+			});
+
+			v.setOnClickListener(new View.OnClickListener()
+			{
+				@Override
+				public void onClick(View view)
+				{
+					if (icl != null)
+						icl.onItemClick(view, position, MenuAdapter.this);
+				}
+			});
 		}
 
 		return v;
@@ -104,5 +134,15 @@ public class MenuAdapter extends BaseAdapter
 			if (filter.suits(d))
 				filteredData.add(d);
 		}
+	}
+
+	public interface OnItemClickListener
+	{
+		void onItemClick(View v, int position, MenuAdapter adapter);
+	}
+
+	public interface OnItemButtonClickListener
+	{
+		void onItemButtonClick(int position, MenuAdapter adapter);
 	}
 }

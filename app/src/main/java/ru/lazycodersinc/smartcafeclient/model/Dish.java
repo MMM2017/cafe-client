@@ -11,6 +11,19 @@ public class Dish
 	public String quantity;
 	public int price;
 
+	public Dish()
+	{
+		type = Type.FIRST;
+		quantity = name = "(none)";
+		price = 0;
+		description = "No description provided";
+	}
+
+	public String getQuantityString()
+	{
+		return (price / 100F) + " RUB / " + quantity;
+	}
+
 	public enum Type
 	{
 		FIRST("First course"),

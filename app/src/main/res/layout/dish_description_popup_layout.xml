@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              xmlns:app="http://schemas.android.com/apk/res-auto" android:layout_width="match_parent"
+              android:layout_height="match_parent" android:padding="8dp">
+
+    <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" app:srcCompat="@mipmap/ic_launcher" android:id="@+id/popupIcon"
+    />
+    <TextView
+            android:text="Potato"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" android:id="@+id/popupDishName" android:layout_weight="1"
+            android:textSize="24sp" android:layout_alignParentTop="true" android:layout_toRightOf="@+id/popupIcon"
+            android:layout_alignParentRight="true" android:layout_alignParentEnd="true"/>
+    <TextView
+            android:text="100 RUB / 1 vedro"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/popupDishQuantity"
+            android:layout_alignBottom="@+id/popupIcon" android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true" android:layout_toRightOf="@+id/popupIcon"
+            android:layout_toEndOf="@+id/popupIcon" android:gravity="right"/>
+    <Button
+            android:text="Order"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/popupOrderButton"
+            android:layout_below="@+id/popupDishQuantity" android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true"/>
+    <EditText
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:inputType="number"
+            android:ems="10"
+            android:layout_alignBottom="@+id/popupOrderButton"
+            android:id="@+id/popupAmount" android:layout_alignParentLeft="true" android:layout_alignParentStart="true"
+            android:hint="Amount" android:text="1" android:layout_toLeftOf="@+id/popupOrderButton"
+            android:layout_toStartOf="@+id/popupOrderButton"/>
+    <EditText
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:inputType="textMultiLine"
+            android:ems="10"
+            android:layout_below="@+id/popupAmount" android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true" android:id="@+id/popupComment" android:layout_above="@+id/popupDescription"
+            android:layout_alignParentRight="true" android:layout_alignParentEnd="true"
+            android:hint="Comment (optional)..." android:gravity="top|left"/>
+    <TextView
+            android:text="This is an multiline and quite long description of a dish."
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/popupDescription"
+            android:textSize="18sp"
+            android:layout_alignParentBottom="true" android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true" android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true"/>
+</RelativeLayout>

@@ -1,5 +1,6 @@
 package ru.lazycodersinc.smartcafeclient;
 
+import android.app.Dialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
@@ -8,25 +9,24 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.view.Menu;
-import android.view.MenuItem;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
-import android.widget.GridView;
-import android.widget.ListView;
-import android.widget.TextView;
+import android.view.*;
+import android.widget.*;
 import ru.lazycodersinc.smartcafeclient.model.AppState;
 import ru.lazycodersinc.smartcafeclient.model.Dish;
 import ru.lazycodersinc.smartcafeclient.model.MenuAdapter;
-
-import java.util.ArrayList;
 
 public class WaiterActivity extends AppCompatActivity
 		implements NavigationView.OnNavigationItemSelectedListener
 {
 
 	private View currentSublayout;
+
+	private Dialog dishPopup;
+	private TextView dishPopupName, dishPopupQuantity, dishPopupDescription;
+	private Button dishPopupOrderButton;
+	private EditText dishPopupComment, dishPopupAmount;
+
+	private Toast toast;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
@@ -56,6 +56,19 @@ public class WaiterActivity extends AppCompatActivity
 		// and now, sublayout initialization
 		currentSublayout = findViewById(R.id.waiterPlaceholder);
 		switchLayout(SubLayout.CATEGORIES);
+
+		// popup initialization
+		dishPopup = new Dialog(this);
+		dishPopup.setContentView(R.layout.dish_description_popup_layout);
+		dishPopupName = (TextView) dishPopup.findViewById(R.id.popupDishName);
+		dishPopupQuantity = (TextView) dishPopup.findViewById(R.id.popupDishQuantity);
+		dishPopupDescription = (TextView) dishPopup.findViewById(R.id.popupDescription);
+		dishPopupAmount = (EditText) dishPopup.findViewById(R.id.popupAmount);
+		dishPopupComment = (EditText) dishPopup.findViewById(R.id.popupComment);
+		dishPopupOrderButton = (Button) dishPopup.findViewById(R.id.popupOrderButton);
+
+		// toast
+		toast = Toast.makeText(getApplicationContext(), "", Toast.LENGTH_SHORT);
 	}
 
 	@Override
@@ -141,14 +154,56 @@ public class WaiterActivity extends AppCompatActivity
 				break;
 
 			case MENU_LIST:
-				MenuAdapter menuAdapter = new MenuAdapter(this, AppState.getMenuCache());
-//				ArrayAdapter<String> menuAdapter = new ArrayAdapter<>(this, R.layout.menu_list_item, R.id.dishNameText,
-//						new String[] { "Test", "Another test", "Fuck you, Android" + AppState.getMenuCache().size() });
+				final MenuAdapter menuAdapter = new MenuAdapter(this, AppState.getMenuCache());
+				menuAdapter.setOnItemClickListener(new MenuAdapter.OnItemClickListener()
+				{
+					@Override
+					public void onItemClick(View view, int i, MenuAdapter ma)
+					{
+						final Dish d = (Dish) ma.getItem(i);
+						dishPopup.setTitle("Order " + d.name);
+
+						dishPopupName.setText(d.name);
+						dishPopupQuantity.setText(d.getQuantityString());
+						dishPopupAmount.setText("1");
+						dishPopupComment.setText("");
+						dishPopupDescription.setText(d.description);
+
+						dishPopupOrderButton.setOnClickListener(new View.OnClickListener()
+						{
+							@Override
+							public void onClick(View view)
+							{
+								orderDish(d,
+									Integer.parseInt(dishPopupAmount.getText().toString()),
+									dishPopupComment.getText().toString());
+								dishPopup.hide();
+							}
+						});
+
+						dishPopup.show();
+					}
+				});
+				menuAdapter.setOnItemButtonClickListener(new MenuAdapter.OnItemButtonClickListener()
+				{
+					@Override
+					public void onItemButtonClick(int position, MenuAdapter adapter)
+					{
+						Dish d = (Dish) adapter.getItem(position);
+						orderDish(d, 1, "");
+					}
+				});
 				ListView list = (ListView) findViewById(R.id.menuListView);
 				list.setAdapter(menuAdapter);
 
 				break;
 		}
+	}
+
+	private void orderDish(Dish d, int amount, String comment)
+	{
+		toast.setText("Ordered " + amount + " of " + d.name);
+		toast.show();
 	}
 
 	private enum SubLayout

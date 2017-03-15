@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
                 xmlns:app="http://schemas.android.com/apk/res-auto" android:layout_width="match_parent"
-                android:layout_height="wrap_content" android:padding="4dp">
+                android:layout_height="wrap_content" android:padding="4dp" android:clickable="true">
 
     <ImageView
             android:layout_width="wrap_content"
@@ -17,7 +17,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" android:layout_alignParentTop="true"
             android:textSize="18sp"
-            android:layout_toLeftOf="@+id/orderDishButton" android:layout_toRightOf="@+id/dishIcon"
+            android:layout_toLeftOf="@+id/orderDishButton"
+            android:layout_toRightOf="@+id/dishIcon"
             android:layout_toEndOf="@+id/dishIcon"/>
     <TextView
             android:text="12 kg"
@@ -25,12 +26,14 @@
             android:layout_height="wrap_content" android:layout_below="@+id/dishNameText"
             android:id="@+id/dishPortionText"
             android:layout_toLeftOf="@+id/orderDishButton"
-            android:layout_toRightOf="@+id/dishIcon" android:layout_toEndOf="@+id/dishIcon"/>
+            android:layout_toRightOf="@+id/dishIcon"
+            android:layout_toEndOf="@+id/dishIcon"/>
     <ImageButton
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             app:srcCompat="@android:drawable/ic_menu_add"
             android:layout_alignParentTop="true" android:layout_alignParentRight="true"
             android:layout_alignParentEnd="true"
-            android:id="@+id/orderDishButton"/>
+            android:id="@+id/orderDishButton"
+    />
 </RelativeLayout>
