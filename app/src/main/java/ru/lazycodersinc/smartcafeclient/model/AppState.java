@@ -8,6 +8,7 @@ import ru.lazycodersinc.smartcafeclient.network.NetworkManager;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -30,12 +31,41 @@ public class AppState
 	private static Map<Integer, Order> ordersRegistry;
 	private static Map<Integer, Notification> notificationsRegistry;
 	private static Map<Integer, User> usersRegistry;
+	private static Map<Integer, Dish> menuRegistry;
 
 	static
 	{
 		ordersRegistry = new HashMap<>();
 		notificationsRegistry = new HashMap<>();
 		usersRegistry = new HashMap<>();
+		menuRegistry = new HashMap<>();
+
+		// fake data
+		int i = 0;
+		Dish d;
+		while (i < 30)
+		{
+			d = new Dish();
+			d.name = "Apple";
+			d.quantity = "1 unit";
+			d.price = (i + 5) * 100;
+			d.type = Dish.Type.DESSERT;
+			menuRegistry.put(i++, d);
+
+			d = new Dish();
+			d.name = "Potato";
+			d.quantity = "1 kg";
+			d.price = (i + 5) * 100;
+			d.type = Dish.Type.SECOND;
+			menuRegistry.put(i++, d);
+
+			d = new Dish();
+			d.name = "Soup";
+			d.quantity = "1 vedro";
+			d.price = (i + 5) * 100;
+			d.type = Dish.Type.FIRST;
+			menuRegistry.put(i++, d);
+		}
 	}
 
 	private static Order registerOrder(int id, Order content)
@@ -107,5 +137,36 @@ public class AppState
 					l.onError(data.status, data.result);
 			}
 		});
+	}
+
+	public static void updateMenu(final FailableActionListener listener)
+	{
+		net.get("/menu", new ApiCallListener()
+		{
+			@Override
+			public void onResult(ApiCallResult data)
+			{
+				if (data.isOk())
+				{
+					// TODO: update cache
+				}
+				if (listener == null) return;
+				if (data.isOk())
+				{
+					listener.onSuccess(data.result);
+				}
+				else
+				{
+					listener.onError(data.status, data.result);
+				}
+			}
+		});
+	}
+
+	public static List<Dish> getMenuCache()
+	{
+		List<Dish> result = new ArrayList<>();
+		result.addAll(menuRegistry.values());
+		return result;
 	}
 }

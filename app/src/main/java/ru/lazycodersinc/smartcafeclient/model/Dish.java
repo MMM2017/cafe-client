@@ -9,6 +9,7 @@ public class Dish
 	public String name;
 	public String description;
 	public String quantity;
+	public int price;
 
 	public enum Type
 	{

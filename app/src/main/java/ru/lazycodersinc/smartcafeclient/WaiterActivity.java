@@ -55,7 +55,7 @@ public class WaiterActivity extends AppCompatActivity
 
 		// and now, sublayout initialization
 		currentSublayout = findViewById(R.id.waiterPlaceholder);
-		switchLayout(SubLayout.MENU_LIST);
+		switchLayout(SubLayout.CATEGORIES);
 	}
 
 	@Override
@@ -110,6 +110,10 @@ public class WaiterActivity extends AppCompatActivity
 				Intent i = new Intent(this, LoginActivity.class);
 				i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
 				startActivity(i);
+				break;
+
+			case R.id.nav_menu:
+				switchLayout(SubLayout.MENU_LIST);
 		}
 
 		DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -137,20 +141,9 @@ public class WaiterActivity extends AppCompatActivity
 				break;
 
 			case MENU_LIST:
-				ArrayList<Dish> test = new ArrayList<>();
-				Dish d = new Dish();
-				d.name = "Apple"; d.quantity= "1 unit";
-				test.add(d);
-
-				d = new Dish();
-				d.name = "Potato"; d.quantity= "1 kg";
-				test.add(d);
-
-				d = new Dish();
-				d.name = "Soup"; d.quantity= "1 vedro";
-				test.add(d);
-
-				MenuAdapter menuAdapter = new MenuAdapter(this, to.layoutId, test);
+				MenuAdapter menuAdapter = new MenuAdapter(this, AppState.getMenuCache());
+//				ArrayAdapter<String> menuAdapter = new ArrayAdapter<>(this, R.layout.menu_list_item, R.id.dishNameText,
+//						new String[] { "Test", "Another test", "Fuck you, Android" + AppState.getMenuCache().size() });
 				ListView list = (ListView) findViewById(R.id.menuListView);
 				list.setAdapter(menuAdapter);
 
