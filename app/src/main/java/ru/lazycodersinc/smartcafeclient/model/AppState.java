@@ -17,7 +17,7 @@ import java.util.Map;
  */
 public class AppState
 {
-	public static String getAppVersion() { return "SmartCafe client v. 0.1.0"; }
+	public static String getAppVersion() { return "SmartCafe client v. 0.2.0"; }
 
 	private static User loggedInAs;
 	public static boolean isLoggedIn() { return loggedInAs == null; }
