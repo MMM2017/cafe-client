@@ -134,9 +134,12 @@ public class WaiterActivity extends AppCompatActivity
 				break;
 
 			case R.id.nav_make_order:
+				toast.setText("Not implemented yet");
+				toast.show();
 				break;
 
 			case R.id.nav_orders:
+				switchLayout(SubLayout.ORDERS_LIST);
 				break;
 		}
 
@@ -153,6 +156,8 @@ public class WaiterActivity extends AppCompatActivity
 		parent.removeView(currentSublayout);
 		currentSublayout = getLayoutInflater().inflate(to.layoutId, parent, false);
 		parent.addView(currentSublayout, index);
+
+		setTitle(to.titleId);
 
 		switch (to)
 		{
@@ -216,6 +221,13 @@ public class WaiterActivity extends AppCompatActivity
 				notiesList.setEmptyView(findViewById(R.id.noNotificationsMessage));
 
 				break;
+
+			case ORDERS_LIST:
+
+				ListView ordersList = (ListView) findViewById(R.id.ordersListView);
+				ordersList.setEmptyView(findViewById(R.id.noOrdersMessage));
+
+				break;
 		}
 	}
 
@@ -227,13 +239,18 @@ public class WaiterActivity extends AppCompatActivity
 
 	private enum SubLayout
 	{
-		CATEGORIES(R.layout.menu_cat_view_layout),
-		MENU_LIST(R.layout.menu_list_view_layout),
-		ORDERS_LIST(0),
-		NOTIFICATIONS(R.layout.notifications_view_layout);
+		CATEGORIES(R.layout.menu_cat_view_layout, R.string.menuViewTitle),
+		MENU_LIST(R.layout.menu_list_view_layout, R.string.menuViewTitle),
+		ORDERS_LIST(R.layout.orders_view_layout, R.string.ordersViewTitle),
+		MAKE_ORDER(0, R.string.makeOrderViewTitle),
+		NOTIFICATIONS(R.layout.notifications_view_layout, R.string.notificationsViewTitle);
 
-		public int layoutId;
+		public int layoutId, titleId;
 
-		SubLayout(int id) { layoutId = id; }
+		SubLayout(int id, int titleId)
+		{
+			layoutId = id;
+			this.titleId = titleId;
+		}
 	}
 }

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+    <SearchView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" android:layout_alignParentTop="true"
+            android:layout_alignParentLeft="true" android:layout_alignParentStart="true"
+            android:id="@+id/ordersSearchView"/>
+    <ListView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:id="@+id/ordersListView"
+            android:layout_below="@+id/ordersSearchView"/>
+
+    <TextView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:text="@string/noOrders"
+            android:gravity="center"
+            android:id="@+id/noOrdersMessage"
+            android:layout_below="@+id/ordersSearchView"
+    />
+</RelativeLayout>
