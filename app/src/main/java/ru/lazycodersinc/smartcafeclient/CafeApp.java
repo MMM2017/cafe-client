@@ -44,9 +44,9 @@ public class CafeApp extends Application
 	private static User loggedInAs;
 	public static boolean isLoggedIn() { return loggedInAs != null; }
 
-	public User currentUser() { return loggedInAs; }
+	public static User currentUser() { return loggedInAs; }
 
-	public void logIn(final String username, String password, final FailableActionListener l)
+	public static void logIn(final String username, String password, final FailableActionListener l)
 	{
 		JSONObject data = new JSONObject();
 		try
@@ -60,7 +60,7 @@ public class CafeApp extends Application
 			l.onError(ApiCallResult.STATUS_UNDEFINED, e);
 			return;
 		}
-		net.post("/auth", data, new ApiCallListener()
+		app.net.post("/auth", data, new ApiCallListener()
 		{
 			@Override
 			public void onResult(ApiCallResult data)
@@ -73,7 +73,7 @@ public class CafeApp extends Application
 					loggedInAs.login = username;
 					loggedInAs.role = User.Role.WAITER;
 					// TODO: set auth token to net
-					net.logIn("I AM THE ADMIN");
+					app.net.logIn("I AM THE ADMIN");
 				}
 				if (l == null) return;
 
@@ -85,9 +85,9 @@ public class CafeApp extends Application
 		});
 	}
 
-	public void logOut()
+	public static void logOut()
 	{
-		net.logOut();
+		app.net.logOut();
 	}
 
 	//
@@ -96,14 +96,14 @@ public class CafeApp extends Application
 
 	private HashMap<Integer, Dish> menuCache = null;
 
-	public void getMenu(final FailableActionListener listener)
+	public static void getMenu(final FailableActionListener listener)
 	{
-		if (menuCache == null)
-			menuCache = new HashMap<>();
+		if (app.menuCache == null)
+			app.menuCache = new HashMap<>();
 
-		if (menuCache.isEmpty())
+		if (app.menuCache.isEmpty())
 		{
-			net.get("/menu", new ApiCallListener()
+			app.net.get("/menu", new ApiCallListener()
 			{
 				@Override
 				public void onResult(ApiCallResult data)
@@ -118,31 +118,31 @@ public class CafeApp extends Application
 						d.quantity = "1 unit";
 						d.price = (i + 5) * 100;
 						d.type = Dish.Type.DESSERT;
-						menuCache.put(i++, d);
+						app.menuCache.put(i++, d);
 
 						d = new Dish();
 						d.name = "Potato";
 						d.quantity = "1 kg";
 						d.price = (i + 5) * 100;
 						d.type = Dish.Type.SECOND;
-						menuCache.put(i++, d);
+						app.menuCache.put(i++, d);
 
 						d = new Dish();
 						d.name = "Soup";
 						d.quantity = "1 vedro";
 						d.price = (i + 5) * 100;
 						d.type = Dish.Type.FIRST;
-						menuCache.put(i++, d);
+						app.menuCache.put(i++, d);
 					}
 
 					// cache is filled, provide listener with data
-					listener.onSuccess(getMenuAsList());
+					listener.onSuccess(app.getMenuAsList());
 				}
 			});
 		}
 		else // menu cache is not empty
 		{
-			listener.onSuccess(getMenuAsList());
+			listener.onSuccess(app.getMenuAsList());
 		}
 	}
 

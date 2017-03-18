@@ -42,7 +42,7 @@ public class WaiterActivity extends AppCompatActivity
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
 	{
-		if (!AppState.isLoggedIn())
+		if (!CafeApp.isLoggedIn())
 		{
 			// disallow to run this for unauthorized user
 			redirectToLoginActivity();
@@ -65,9 +65,9 @@ public class WaiterActivity extends AppCompatActivity
 		// and custom values insertion
 		View header = navigationView.getHeaderView(0);
 		TextView userLabel = (TextView) header.findViewById(R.id.navHeaderLoggedIn);
-		userLabel.setText("Currently logged in as " + AppState.currentUser().login);
+		userLabel.setText("Currently logged in as " + CafeApp.currentUser().login);
 		TextView verLabel = (TextView) header.findViewById(R.id.navHeaderClientVersion);
-		verLabel.setText(AppState.getAppVersion());
+		verLabel.setText(CafeApp.getAppVersion());
 
 		// fragments
 		fMgr = getSupportFragmentManager();
@@ -130,7 +130,7 @@ public class WaiterActivity extends AppCompatActivity
 		switch (id)
 		{
 			case R.id.nav_logout:
-				AppState.logOut();
+				CafeApp.logOut();
 				redirectToLoginActivity();
 				break;
 

@@ -21,9 +21,26 @@
             android:id="@+id/noDishesMessage"
             android:visibility="gone"
     />
+    <TextView
+            android:text="@string/menuFetchingError"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:layout_below="@+id/menuSearch"
+            android:id="@+id/dishesErrorMessage"
+            android:visibility="gone"
+            android:textColor="@android:color/holo_red_dark"/>
     <SearchView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:id="@+id/menuSearch" android:layout_alignParentTop="true" android:layout_alignParentLeft="true"
             android:layout_alignParentStart="true"/>
+    <ProgressBar
+            style="?android:attr/progressBarStyleLarge"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:id="@+id/dishesListProgressBar"
+            android:visibility="gone"
+            android:indeterminate="true"/>
 </RelativeLayout>

@@ -9,9 +9,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.*;
+import ru.lazycodersinc.smartcafeclient.CafeApp;
 import ru.lazycodersinc.smartcafeclient.R;
 import ru.lazycodersinc.smartcafeclient.model.AppState;
 import ru.lazycodersinc.smartcafeclient.model.Dish;
+import ru.lazycodersinc.smartcafeclient.model.FailableActionListener;
 import ru.lazycodersinc.smartcafeclient.model.MenuAdapter;
 
 /**
@@ -28,6 +30,8 @@ public class MenuListFragment extends Fragment
 	private TextView dishPopupName, dishPopupQuantity, dishPopupDescription;
 	private Button dishPopupOrderButton;
 	private EditText dishPopupComment, dishPopupAmount;
+
+	private ProgressBar processingBar;
 
 	private MenuAdapter menuAdapter;
 
@@ -80,9 +84,12 @@ public class MenuListFragment extends Fragment
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
 	{
-		View menuListLayout = inflater.inflate(R.layout.menu_list_view_layout, container, false);
+		final View menuListLayout = inflater.inflate(R.layout.menu_list_view_layout, container, false);
 
-		ListView menuList = (ListView) menuListLayout.findViewById(R.id.menuListView);
+		final ListView menuList = (ListView) menuListLayout.findViewById(R.id.menuListView);
+		processingBar = (ProgressBar) menuListLayout.findViewById(R.id.dishesListProgressBar);
+
+		processingBar.setVisibility(View.VISIBLE);
 
 		// popup initialization
 		dishPopup = new Dialog(getContext());
@@ -97,55 +104,74 @@ public class MenuListFragment extends Fragment
 		// toast
 		toast = Toast.makeText(getActivity().getApplicationContext(), "", Toast.LENGTH_SHORT);
 
-		menuAdapter = new MenuAdapter(getContext(), AppState.getMenuCache());
-		menuAdapter.setOnItemClickListener(new MenuAdapter.OnItemClickListener()
+		// async populating menu list
+		CafeApp.getMenu(new FailableActionListener()
 		{
 			@Override
-			public void onItemClick(View view, int i, MenuAdapter ma)
+			public void onSuccess(Object... params)
 			{
-				final Dish d = (Dish) ma.getItem(i);
-				dishPopup.setTitle("Order " + d.name);
+				processingBar.setVisibility(View.GONE);
 
-				dishPopupName.setText(d.name);
-				dishPopupQuantity.setText(d.getQuantityString());
-				dishPopupAmount.setText("1");
-				dishPopupComment.setText("");
-				dishPopupDescription.setText(d.description);
-
-				dishPopupOrderButton.setOnClickListener(new View.OnClickListener()
+				menuAdapter = new MenuAdapter(getContext(), AppState.getMenuCache());
+				menuAdapter.setOnItemClickListener(new MenuAdapter.OnItemClickListener()
 				{
 					@Override
-					public void onClick(View view)
+					public void onItemClick(View view, int i, MenuAdapter ma)
 					{
-						orderDish(d,
-							Integer.parseInt(dishPopupAmount.getText().toString()),
-							dishPopupComment.getText().toString());
-						dishPopup.hide();
+						final Dish d = (Dish) ma.getItem(i);
+						dishPopup.setTitle("Order " + d.name);
+
+						dishPopupName.setText(d.name);
+						dishPopupQuantity.setText(d.getQuantityString());
+						dishPopupAmount.setText("1");
+						dishPopupComment.setText("");
+						dishPopupDescription.setText(d.description);
+
+						dishPopupOrderButton.setOnClickListener(new View.OnClickListener()
+						{
+							@Override
+							public void onClick(View view)
+							{
+								orderDish(d,
+									Integer.parseInt(dishPopupAmount.getText().toString()),
+									dishPopupComment.getText().toString());
+								dishPopup.hide();
+							}
+						});
+
+						dishPopup.show();
+					}
+				});
+				menuAdapter.setOnItemButtonClickListener(new MenuAdapter.OnItemButtonClickListener()
+				{
+					@Override
+					public void onItemButtonClick(int position, MenuAdapter adapter)
+					{
+						Dish d = (Dish) adapter.getItem(position);
+						orderDish(d, 1, "");
 					}
 				});
 
-				dishPopup.show();
+				if (catId != -1)
+				{
+					Dish.Type cat = Dish.Type.values()[catId];
+					menuAdapter.setFilter(cat);
+				}
+				menuAdapter.setFilter(searchQuery);
+
+				menuList.setAdapter(menuAdapter);
+				menuList.setEmptyView(menuListLayout.findViewById(R.id.noDishesMessage));
 			}
-		});
-		menuAdapter.setOnItemButtonClickListener(new MenuAdapter.OnItemButtonClickListener()
-		{
+
 			@Override
-			public void onItemButtonClick(int position, MenuAdapter adapter)
+			public void onError(Object... params)
 			{
-				Dish d = (Dish) adapter.getItem(position);
-				orderDish(d, 1, "");
+				processingBar.setVisibility(View.GONE);
+				menuList.setEmptyView(menuListLayout.findViewById(R.id.noDishesMessage));
+				TextView errorView = (TextView) menuListLayout.findViewById(R.id.dishesErrorMessage);
+				errorView.setVisibility(View.VISIBLE);
 			}
 		});
-
-		if (catId != -1)
-		{
-			Dish.Type cat = Dish.Type.values()[catId];
-			menuAdapter.setFilter(cat);
-		}
-		menuAdapter.setFilter(searchQuery);
-
-		menuList.setAdapter(menuAdapter);
-		menuList.setEmptyView(menuListLayout.findViewById(R.id.noDishesMessage));
 
 		return menuListLayout;
 	}
@@ -153,7 +179,8 @@ public class MenuListFragment extends Fragment
 	public void filterByCategory(int cat)
 	{
 		catId = cat;
-		menuAdapter.setFilter(Dish.Type.values()[cat]);
+		if (menuAdapter != null)
+			menuAdapter.setFilter(Dish.Type.values()[cat]);
 	}
 
 	private void orderDish(Dish d, int amount, String comment)

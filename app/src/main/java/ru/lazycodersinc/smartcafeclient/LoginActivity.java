@@ -38,7 +38,8 @@ public class LoginActivity extends AppCompatActivity //implements LoaderCallback
 	/**
 	 * Keep track of the login task to ensure we can cancel it if requested.
 	 */
-	private UserLoginTask mAuthTask = null;
+	// private UserLoginTask mAuthTask = null;
+	private boolean isBusy = false;
 
 	// UI references.
 	private AutoCompleteTextView mEmailView;
@@ -91,10 +92,7 @@ public class LoginActivity extends AppCompatActivity //implements LoaderCallback
 	 */
 	private void attemptLogin()
 	{
-		if (mAuthTask != null)
-		{
-			return;
-		}
+		if (isBusy) return;
 
 		// Reset errors.
 		mEmailView.setError(null);
@@ -140,13 +138,15 @@ public class LoginActivity extends AppCompatActivity //implements LoaderCallback
 			// Show a progress spinner, and kick off a background task to
 			// perform the user login attempt.
 			showProgress(true);
+			isBusy = true;
 //			mAuthTask = new UserLoginTask(email, password);
 //			mAuthTask.execute((Void) null);
-			AppState.logIn(login, password, new FailableActionListener()
+			CafeApp.logIn(login, password, new FailableActionListener()
 			{
 				@Override
 				public void onSuccess(Object... params)
 				{
+					isBusy = false;
 					Intent i = new Intent(LoginActivity.this, WaiterActivity.class);
 					i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
 					LoginActivity.this.startActivity(i);
@@ -155,6 +155,7 @@ public class LoginActivity extends AppCompatActivity //implements LoaderCallback
 				@Override
 				public void onError(Object... params)
 				{
+					isBusy = false;
 					showProgress(false);
 					int code = (int) params[0];
 					if (code == 401)
@@ -286,7 +287,7 @@ public class LoginActivity extends AppCompatActivity //implements LoaderCallback
 		@Override
 		protected void onPostExecute(final Boolean success)
 		{
-			mAuthTask = null;
+//			mAuthTask = null;
 			showProgress(false);
 
 			if (success)
@@ -307,7 +308,7 @@ public class LoginActivity extends AppCompatActivity //implements LoaderCallback
 		@Override
 		protected void onCancelled()
 		{
-			mAuthTask = null;
+//			mAuthTask = null;
 			showProgress(false);
 		}
 	}
