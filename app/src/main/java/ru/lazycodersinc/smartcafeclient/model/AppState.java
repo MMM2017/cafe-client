@@ -20,7 +20,7 @@ public class AppState
 	public static String getAppVersion() { return "SmartCafe client v. 0.2.0"; }
 
 	private static User loggedInAs;
-	public static boolean isLoggedIn() { return loggedInAs == null; }
+	public static boolean isLoggedIn() { return loggedInAs != null; }
 
 	public static User currentUser() { return loggedInAs; }
 
@@ -137,6 +137,11 @@ public class AppState
 					l.onError(data.status, data.result);
 			}
 		});
+	}
+
+	public static void logOut()
+	{
+		net.logOut();
 	}
 
 	public static void updateMenu(final FailableActionListener listener)
