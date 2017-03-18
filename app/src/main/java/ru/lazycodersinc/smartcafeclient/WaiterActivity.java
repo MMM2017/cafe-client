@@ -37,9 +37,16 @@ public class WaiterActivity extends AppCompatActivity
 	private FragmentManager fMgr;
 	private ViewGroup contentRoot;
 
+	private boolean startingFirstTime = true;
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
 	{
+		if (!AppState.isLoggedIn())
+		{
+			// disallow to run this for unauthorized user
+			redirectToLoginActivity();
+		}
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_officiant);
 		Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -67,9 +74,12 @@ public class WaiterActivity extends AppCompatActivity
 		contentRoot = (ViewGroup) findViewById(R.id.content_officiant);
 
 		// initial fragment
-		fMgr.beginTransaction()
-			.add(R.id.content_officiant, MenuCategoriesFragment.newInstance())
-			.commit();
+		if (savedInstanceState == null)
+		{
+			fMgr.beginTransaction()
+				.add(R.id.content_officiant, MenuCategoriesFragment.newInstance())
+				.commit();
+		}
 	}
 
 	@Override
@@ -116,14 +126,12 @@ public class WaiterActivity extends AppCompatActivity
 	{
 		// Handle navigation view item clicks here.
 		int id = item.getItemId();
-		Intent i;
 
 		switch (id)
 		{
 			case R.id.nav_logout:
-				i = new Intent(this, LoginActivity.class);
-				i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-				startActivity(i);
+				AppState.logOut();
+				redirectToLoginActivity();
 				break;
 
 			case R.id.nav_menu:
@@ -298,6 +306,13 @@ public class WaiterActivity extends AppCompatActivity
 		Bundle options = new Bundle();
 		options.putInt(MenuCategoryActivity.ARG_CAT_ID, cat.ordinal());
 		i.putExtras(options);
+		startActivity(i);
+	}
+
+	private void redirectToLoginActivity()
+	{
+		Intent i = new Intent(this, LoginActivity.class);
+		i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
 		startActivity(i);
 	}
 

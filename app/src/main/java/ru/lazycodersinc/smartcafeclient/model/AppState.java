@@ -15,6 +15,7 @@ import java.util.Map;
  * Class provides static info about application state.
  * Class serves as central point to perform any operations on data.
  */
+@Deprecated
 public class AppState
 {
 	public static String getAppVersion() { return "SmartCafe client v. 0.2.0"; }
@@ -171,7 +172,8 @@ public class AppState
 	public static List<Dish> getMenuCache()
 	{
 		List<Dish> result = new ArrayList<>();
-		result.addAll(menuRegistry.values());
+		if (menuRegistry != null)
+			result.addAll(menuRegistry.values());
 		return result;
 	}
 }

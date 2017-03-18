@@ -106,7 +106,7 @@ public class NetworkManager
 				}
 				if (isLoggedIn())
 					urlConnection.setRequestProperty("Authorization", authToken);
-				
+
 				urlConnection.connect();
 
 				InputStream inputStream = urlConnection.getInputStream();
