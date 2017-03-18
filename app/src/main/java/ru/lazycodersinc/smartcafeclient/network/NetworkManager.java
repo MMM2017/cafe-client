@@ -104,6 +104,9 @@ public class NetworkManager
 					urlConnection.setRequestProperty("Content-Type","application/json");
 					urlConnection.setRequestProperty("Content-Length", Integer.toString(bodyBytes.length));
 				}
+				if (isLoggedIn())
+					urlConnection.setRequestProperty("Authorization", authToken);
+				
 				urlConnection.connect();
 
 				InputStream inputStream = urlConnection.getInputStream();
