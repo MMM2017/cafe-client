@@ -1,6 +1,9 @@
 package ru.lazycodersinc.smartcafeclient;
 
 import android.app.Dialog;
+import android.net.Uri;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
@@ -14,19 +17,25 @@ import android.widget.*;
 import ru.lazycodersinc.smartcafeclient.model.AppState;
 import ru.lazycodersinc.smartcafeclient.model.Dish;
 import ru.lazycodersinc.smartcafeclient.model.MenuAdapter;
+import ru.lazycodersinc.smartcafeclient.waiter.MenuCategoriesFragment;
+import ru.lazycodersinc.smartcafeclient.waiter.MenuCategoryActivity;
+import ru.lazycodersinc.smartcafeclient.waiter.MenuListFragment;
 
 public class WaiterActivity extends AppCompatActivity
-		implements NavigationView.OnNavigationItemSelectedListener
+		implements NavigationView.OnNavigationItemSelectedListener,
+				   MenuListFragment.OnFragmentInteractionListener,
+				   MenuCategoriesFragment.OnFragmentInteractionListener
 {
 
 	private View currentSublayout;
+	private SubLayout currentSublayoutType;
 
-	private Dialog dishPopup;
-	private TextView dishPopupName, dishPopupQuantity, dishPopupDescription;
-	private Button dishPopupOrderButton;
-	private EditText dishPopupComment, dishPopupAmount;
+	private MenuAdapter menuAdapter;
 
 	private Toast toast;
+
+	private FragmentManager fMgr;
+	private ViewGroup contentRoot;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
@@ -53,22 +62,14 @@ public class WaiterActivity extends AppCompatActivity
 		TextView verLabel = (TextView) header.findViewById(R.id.navHeaderClientVersion);
 		verLabel.setText(AppState.getAppVersion());
 
-		// and now, sublayout initialization
-		currentSublayout = findViewById(R.id.waiterPlaceholder);
-		switchLayout(SubLayout.CATEGORIES);
+		// fragments
+		fMgr = getSupportFragmentManager();
+		contentRoot = (ViewGroup) findViewById(R.id.content_officiant);
 
-		// popup initialization
-		dishPopup = new Dialog(this);
-		dishPopup.setContentView(R.layout.dish_description_popup_layout);
-		dishPopupName = (TextView) dishPopup.findViewById(R.id.popupDishName);
-		dishPopupQuantity = (TextView) dishPopup.findViewById(R.id.popupDishQuantity);
-		dishPopupDescription = (TextView) dishPopup.findViewById(R.id.popupDescription);
-		dishPopupAmount = (EditText) dishPopup.findViewById(R.id.popupAmount);
-		dishPopupComment = (EditText) dishPopup.findViewById(R.id.popupComment);
-		dishPopupOrderButton = (Button) dishPopup.findViewById(R.id.popupOrderButton);
-
-		// toast
-		toast = Toast.makeText(getApplicationContext(), "", Toast.LENGTH_SHORT);
+		// initial fragment
+		fMgr.beginTransaction()
+			.add(R.id.content_officiant, MenuCategoriesFragment.newInstance())
+			.commit();
 	}
 
 	@Override
@@ -110,36 +111,39 @@ public class WaiterActivity extends AppCompatActivity
 		return super.onOptionsItemSelected(item);
 	}
 
-	@SuppressWarnings("StatementWithEmptyBody")
 	@Override
 	public boolean onNavigationItemSelected(MenuItem item)
 	{
 		// Handle navigation view item clicks here.
 		int id = item.getItemId();
+		Intent i;
 
 		switch (id)
 		{
 			case R.id.nav_logout:
-				Intent i = new Intent(this, LoginActivity.class);
+				i = new Intent(this, LoginActivity.class);
 				i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
 				startActivity(i);
 				break;
 
 			case R.id.nav_menu:
-				switchLayout(SubLayout.MENU_LIST);
+				// switchLayout(SubLayout.MENU_LIST);
+				fMgr.beginTransaction()
+					.replace(R.id.content_officiant, MenuListFragment.newInstance(-1, ""))
+					.commit();
 				break;
 
 			case R.id.nav_notifications:
-				switchLayout(SubLayout.NOTIFICATIONS);
+				// switchLayout(SubLayout.NOTIFICATIONS);
 				break;
 
 			case R.id.nav_make_order:
-				toast.setText("Not implemented yet");
-				toast.show();
+				// toast.setText("Not implemented yet");
+				// toast.show();
 				break;
 
 			case R.id.nav_orders:
-				switchLayout(SubLayout.ORDERS_LIST);
+				// switchLayout(SubLayout.ORDERS_LIST);
 				break;
 		}
 
@@ -150,6 +154,9 @@ public class WaiterActivity extends AppCompatActivity
 
 	private void switchLayout(SubLayout to)
 	{
+		if (to == currentSublayoutType) return;
+		currentSublayoutType = to;
+
 		// all that stuff to replace views
 		ViewGroup parent = (ViewGroup) currentSublayout.getParent();
 		int index = parent.indexOfChild(currentSublayout);
@@ -162,11 +169,24 @@ public class WaiterActivity extends AppCompatActivity
 		switch (to)
 		{
 			case CATEGORIES:
-				String[] cats = new String[] { "First course", "Second course", "Drinks", "Desserts" };
-				ArrayAdapter<String> adapter =
-						new ArrayAdapter<>(this, R.layout.menu_category_view, R.id.menuCategoryLabel, cats);
+				final ArrayAdapter<Dish.Type> adapter = new ArrayAdapter<>(
+					this,
+					R.layout.menu_category_view,
+					R.id.menuCategoryLabel,
+					Dish.Type.values());
 				GridView catsView = (GridView) findViewById(R.id.menuCatsGridView);
 				catsView.setAdapter(adapter);
+
+				catsView.setOnItemClickListener(new AdapterView.OnItemClickListener()
+				{
+					@Override
+					public void onItemClick(AdapterView<?> adapterView, View view, int i, long l)
+					{
+						Dish.Type cat = adapter.getItem(i);
+						showMenuCategory(cat);
+					}
+				});
+
 				break;
 
 			case MENU_LIST:
@@ -177,27 +197,27 @@ public class WaiterActivity extends AppCompatActivity
 					public void onItemClick(View view, int i, MenuAdapter ma)
 					{
 						final Dish d = (Dish) ma.getItem(i);
-						dishPopup.setTitle("Order " + d.name);
-
-						dishPopupName.setText(d.name);
-						dishPopupQuantity.setText(d.getQuantityString());
-						dishPopupAmount.setText("1");
-						dishPopupComment.setText("");
-						dishPopupDescription.setText(d.description);
-
-						dishPopupOrderButton.setOnClickListener(new View.OnClickListener()
-						{
-							@Override
-							public void onClick(View view)
-							{
-								orderDish(d,
-									Integer.parseInt(dishPopupAmount.getText().toString()),
-									dishPopupComment.getText().toString());
-								dishPopup.hide();
-							}
-						});
-
-						dishPopup.show();
+//						dishPopup.setTitle("Order " + d.name);
+//
+//						dishPopupName.setText(d.name);
+//						dishPopupQuantity.setText(d.getQuantityString());
+//						dishPopupAmount.setText("1");
+//						dishPopupComment.setText("");
+//						dishPopupDescription.setText(d.description);
+//
+//						dishPopupOrderButton.setOnClickListener(new View.OnClickListener()
+//						{
+//							@Override
+//							public void onClick(View view)
+//							{
+//								orderDish(d,
+//									Integer.parseInt(dishPopupAmount.getText().toString()),
+//									dishPopupComment.getText().toString());
+//								dishPopup.hide();
+//							}
+//						});
+//
+//						dishPopup.show();
 					}
 				});
 				menuAdapter.setOnItemButtonClickListener(new MenuAdapter.OnItemButtonClickListener()
@@ -212,6 +232,8 @@ public class WaiterActivity extends AppCompatActivity
 				ListView list = (ListView) findViewById(R.id.menuListView);
 				list.setAdapter(menuAdapter);
 				list.setEmptyView(findViewById(R.id.noDishesMessage));
+
+				this.menuAdapter = menuAdapter;
 
 				break;
 
@@ -235,6 +257,48 @@ public class WaiterActivity extends AppCompatActivity
 	{
 		toast.setText("Ordered " + amount + " of " + d.name);
 		toast.show();
+	}
+
+	private void searchMenu(String query)
+	{
+		switchLayout(SubLayout.MENU_LIST);
+		if (menuAdapter != null)
+		{
+			menuAdapter.setFilter(query);
+		}
+	}
+	private void showMenuCategory(Dish.Type cat)
+	{
+		switchLayout(SubLayout.MENU_LIST);
+		if (menuAdapter != null)
+		{
+			if (cat != null)
+			{
+				menuAdapter.setFilter(cat);
+				setTitle(cat.name);
+			}
+			else
+			{
+				menuAdapter.clearFilter();
+				setTitle(SubLayout.MENU_LIST.titleId);
+			}
+		}
+	}
+
+	@Override
+	public void onFragmentInteraction(Uri uri)
+	{
+
+	}
+
+	@Override
+	public void onCategorySelected(Dish.Type cat)
+	{
+		Intent i = new Intent(this, MenuCategoryActivity.class);
+		Bundle options = new Bundle();
+		options.putInt(MenuCategoryActivity.ARG_CAT_ID, cat.ordinal());
+		i.putExtras(options);
+		startActivity(i);
 	}
 
 	private enum SubLayout

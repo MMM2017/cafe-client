@@ -30,5 +30,5 @@ public class MenuSearchQuery
 		return true;
 	}
 
-	public static final MenuSearchQuery identity = new MenuSearchQuery();
+	public static MenuSearchQuery getIdentity() { return new MenuSearchQuery(); }
 }

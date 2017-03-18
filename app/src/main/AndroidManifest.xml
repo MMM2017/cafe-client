@@ -2,7 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
           package="ru.lazycodersinc.smartcafeclient">
 
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
 
     <application
             android:allowBackup="true"
@@ -23,6 +23,8 @@
                 android:name=".WaiterActivity"
                 android:label="@string/title_activity_officiant"
                 android:theme="@style/AppTheme.NoActionBar">
+        </activity>
+        <activity android:name=".waiter.MenuCategoryActivity">
         </activity>
     </application>
 

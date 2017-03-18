@@ -27,4 +27,7 @@
     <string name="ordersViewTitle">Orders</string>
     <string name="notificationsViewTitle">Notifications</string>
     <string name="makeOrderViewTitle">Make order</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

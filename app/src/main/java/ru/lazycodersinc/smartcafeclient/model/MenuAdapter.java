@@ -29,7 +29,7 @@ public class MenuAdapter extends BaseAdapter
 	{
 		ctx = context;
 		data.addAll(objects);
-		filter = MenuSearchQuery.identity;
+		filter = MenuSearchQuery.getIdentity();
 		applyFilter();
 		notifyDataSetChanged();
 	}

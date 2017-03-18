@@ -13,12 +13,5 @@
         app:layout_behavior="@string/appbar_scrolling_view_behavior"
         tools:showIn="@layout/app_bar_officiant"
         tools:context="ru.lazycodersinc.smartcafeclient.WaiterActivity">
-
-    <TextView
-            android:text="Loading..."
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:textAlignment="center" android:textStyle="italic"
-            android:id="@+id/waiterPlaceholder"
-            android:gravity="center_vertical"/>
+    
 </RelativeLayout>
