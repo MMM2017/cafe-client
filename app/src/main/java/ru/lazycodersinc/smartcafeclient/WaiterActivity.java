@@ -20,11 +20,13 @@ import ru.lazycodersinc.smartcafeclient.model.MenuAdapter;
 import ru.lazycodersinc.smartcafeclient.waiter.MenuCategoriesFragment;
 import ru.lazycodersinc.smartcafeclient.waiter.MenuCategoryActivity;
 import ru.lazycodersinc.smartcafeclient.waiter.MenuListFragment;
+import ru.lazycodersinc.smartcafeclient.waiter.NotificationsListFragment;
 
 public class WaiterActivity extends AppCompatActivity
 		implements NavigationView.OnNavigationItemSelectedListener,
 				   MenuListFragment.OnFragmentInteractionListener,
-				   MenuCategoriesFragment.OnFragmentInteractionListener
+				   MenuCategoriesFragment.OnFragmentInteractionListener,
+				   NotificationsListFragment.OnNotiesReadListener
 {
 
 	private View currentSublayout;
@@ -143,6 +145,9 @@ public class WaiterActivity extends AppCompatActivity
 
 			case R.id.nav_notifications:
 				// switchLayout(SubLayout.NOTIFICATIONS);
+				fMgr.beginTransaction()
+					.replace(R.id.content_officiant, NotificationsListFragment.newInstance())
+					.commit();
 				break;
 
 			case R.id.nav_make_order:
@@ -314,6 +319,12 @@ public class WaiterActivity extends AppCompatActivity
 		Intent i = new Intent(this, LoginActivity.class);
 		i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
 		startActivity(i);
+	}
+
+	@Override
+	public void onNotificationsRead(int unreadLeft)
+	{
+
 	}
 
 	private enum SubLayout

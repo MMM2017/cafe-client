@@ -15,4 +15,10 @@ public class Notification
 		relatedTo = related;
 		read = false;
 	}
+
+	@Override
+	public String toString()
+	{
+		return text;
+	}
 }

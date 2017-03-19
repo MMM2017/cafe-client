@@ -5,6 +5,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import ru.lazycodersinc.smartcafeclient.model.Dish;
 import ru.lazycodersinc.smartcafeclient.model.FailableActionListener;
+import ru.lazycodersinc.smartcafeclient.model.Notification;
 import ru.lazycodersinc.smartcafeclient.model.User;
 import ru.lazycodersinc.smartcafeclient.network.ApiCallListener;
 import ru.lazycodersinc.smartcafeclient.network.ApiCallResult;
@@ -15,7 +16,7 @@ import java.util.HashMap;
 import java.util.List;
 
 /**
- * Created by bob on 18.03.17.
+ * Main application class, also serves as an API wrapper
  */
 public class CafeApp extends Application
 {
@@ -151,5 +152,40 @@ public class CafeApp extends Application
 		List<Dish> result = new ArrayList<>();
 		result.addAll(menuCache.values());
 		return result;
+	}
+
+	//
+	// NOTIES
+	//
+
+	public static void fetchNotifications(final FailableActionListener listener)
+	{
+		app.net.get("/notification", new ApiCallListener()
+		{
+			@Override
+			public void onResult(ApiCallResult data)
+			{
+				if (data.isOk())
+				{
+					// generating test data
+					// TODO: obtain one from response
+					List<Notification> result = new ArrayList<>();
+					for (int i = 0; i < (int) Math.floor(Math.random() * 5); i++)
+					{
+						result.add(new Notification("Noty #" + (i + 1), null));
+					}
+					listener.onSuccess(result);
+				}
+				else
+				{
+					listener.onError(data.status);
+				}
+			}
+		});
+	}
+
+	public static void readNotification(Notification n, FailableActionListener listener)
+	{
+		// TODO
 	}
 }
