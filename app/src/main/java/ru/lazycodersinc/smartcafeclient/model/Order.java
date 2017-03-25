@@ -16,6 +16,7 @@ public class Order
 	{
 		entries = new ArrayList<>();
 		comment = "";
+		table = "unknown table";
 	}
 
 	public State getOrderState()

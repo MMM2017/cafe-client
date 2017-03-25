@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" android:padding="8dp">
+
+    <TextView
+            android:text="Table #42"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:id="@+id/orderTableText"
+            android:textSize="24sp" android:textColor="#444"/>
+    <TextView
+            android:text="@string/orderStatusLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/orderTableText"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:id="@+id/textView2"/>
+    <TextView
+            android:text="open"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/orderTableText"
+            android:layout_toRightOf="@+id/textView2"
+            android:layout_toEndOf="@+id/textView2"
+            android:id="@+id/orderStatusText"
+            android:layout_marginLeft="8dp"
+            android:textColor="#00d000"/>
+    <TextView
+            android:text="@string/orderEntriesOverview"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/textView2"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:id="@+id/orderOverviewText"
+            android:textColor="#666"/>
+    <TextView
+            android:text="@string/lorem"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/orderOverviewText"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:id="@+id/orderCommentText"
+            android:textColor="#999"
+            android:layout_marginTop="4dp"/>
+</RelativeLayout>

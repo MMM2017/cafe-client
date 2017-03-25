@@ -98,7 +98,7 @@ public class MenuCategoriesFragment extends Fragment
 		else
 		{
 			throw new RuntimeException(context.toString()
-				+ " must implement OnFragmentInteractionListener");
+				+ " must implement OnOrdersListUpdatedListener");
 		}
 	}
 
