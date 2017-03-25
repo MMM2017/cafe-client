@@ -36,6 +36,9 @@
     <string name="notificationsUpdatedJustNow">Updated just now</string>
     <string name="notificationsUpdating">Fetching last notifications&#8230;</string>
 
+    <string name="timesAgo">%1$s ago</string>
+    <string name="justNow">just now</string>
+
     <plurals name="hour">
         <item quantity="one">%1$d hour</item>
         <item quantity="few">%1$d hours</item>

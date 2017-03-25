@@ -1,6 +1,7 @@
 package ru.lazycodersinc.smartcafeclient;
 
 import android.app.Application;
+import android.content.res.Resources;
 import org.json.JSONException;
 import org.json.JSONObject;
 import ru.lazycodersinc.smartcafeclient.model.Dish;
@@ -11,9 +12,7 @@ import ru.lazycodersinc.smartcafeclient.network.ApiCallListener;
 import ru.lazycodersinc.smartcafeclient.network.ApiCallResult;
 import ru.lazycodersinc.smartcafeclient.network.NetworkManager;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 /**
  * Main application class, also serves as an API wrapper
@@ -170,9 +169,9 @@ public class CafeApp extends Application
 					// generating test data
 					// TODO: obtain one from response
 					List<Notification> result = new ArrayList<>();
-					for (int i = 0; i < (int) Math.floor(Math.random() * 5); i++)
+					for (int i = 0; i < (int) Math.floor(Math.random() * 25); i++)
 					{
-						result.add(new Notification("Noty #" + (i + 1), null));
+						result.add(new Notification("Noty #" + (i + 1), null, Calendar.getInstance()));
 					}
 					listener.onSuccess(result);
 				}
@@ -187,5 +186,35 @@ public class CafeApp extends Application
 	public static void readNotification(Notification n, FailableActionListener listener)
 	{
 		// TODO
+	}
+
+	public static void readAll(FailableActionListener listener)
+	{
+		// TODO
+		// Warning: listener expects that List<Notification> will be returned at first param
+		// (just like in fetchNotifications) and it will contain all actual noties.
+		fetchNotifications(listener);
+	}
+
+	//
+	// UTILS
+	//
+
+	private static int[] units = new int[] { R.plurals.second, R.plurals.minute, R.plurals.hour };
+	public static String getDateOffsetString(long millis)
+	{
+		millis /= 1000; // now in seconds
+
+		int iteration = 0; // 0 for second, 1 for minute, 2 for hour
+		while (millis > 60)
+		{
+			++iteration;
+			millis /= 60;
+			if (iteration == 2) break;
+		}
+
+		Resources res = app.getResources();
+		String howMuchAgo = res.getQuantityString(units[iteration], (int) millis, (int) millis);
+		return howMuchAgo;
 	}
 }

@@ -5,17 +5,20 @@ import android.content.res.Resources;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 import ru.lazycodersinc.smartcafeclient.CafeApp;
 import ru.lazycodersinc.smartcafeclient.R;
 import ru.lazycodersinc.smartcafeclient.model.FailableActionListener;
+import ru.lazycodersinc.smartcafeclient.model.NotiesAdapter;
 import ru.lazycodersinc.smartcafeclient.model.Notification;
 
 import java.util.Date;
@@ -39,6 +42,10 @@ public class NotificationsListFragment extends Fragment implements SwipeRefreshL
 	private ListView notiesList;
 
 	private Date lastUpdatedTime = null;
+
+	private NotiesAdapter adapter;
+
+	private boolean isWorking = false;
 
 	public NotificationsListFragment()
 	{
@@ -75,6 +82,8 @@ public class NotificationsListFragment extends Fragment implements SwipeRefreshL
 		View notiesView = inflater.inflate(R.layout.notifications_view_layout, container, false);
 
 		notiesList = (ListView) notiesView.findViewById(R.id.notificationsListView);
+		adapter = new NotiesAdapter(getContext());
+		notiesList.setAdapter(adapter);
 
 		refresher = (SwipeRefreshLayout) notiesView.findViewById(R.id.notiesSwipeRefresher);
 		refresher.setOnRefreshListener(this);
@@ -87,6 +96,20 @@ public class NotificationsListFragment extends Fragment implements SwipeRefreshL
 			@Override
 			public void run() {
 				refresher.setRefreshing(true);
+			}
+		});
+
+		FloatingActionButton fab = (FloatingActionButton) notiesView.findViewById(R.id.readAllNotiesFab);
+		fab.setOnClickListener(new View.OnClickListener()
+		{
+			@Override
+			public void onClick(View view)
+			{
+				if (isWorking) return;
+				refresher.setRefreshing(true);
+				emptyRefresher.setRefreshing(true);
+				isWorking = true;
+				CafeApp.readAll(refreshListener);
 			}
 		});
 
@@ -116,7 +139,6 @@ public class NotificationsListFragment extends Fragment implements SwipeRefreshL
 		statusText.setTextColor(android.R.color.holo_red_dark);
 	}
 
-	private int[] units = new int[] { R.plurals.second, R.plurals.minute, R.plurals.hour };
 	private void updateStatus()
 	{
 		if (lastUpdatedTime == null)
@@ -124,18 +146,8 @@ public class NotificationsListFragment extends Fragment implements SwipeRefreshL
 			return;
 		}
 		long diff = new Date().getTime() - lastUpdatedTime.getTime();
-		diff /= 1000; // now in seconds
-		int iteration = 0; // 0 for second, 1 for minute, 2 for hour
-		while (diff > 60)
-		{
-			++iteration;
-			diff /= 60;
-			if (iteration == 2) break;
-		}
-
-		Resources res = getResources();
-		String howMuchAgo = res.getQuantityString(units[iteration], (int) diff, (int) diff);
-		String result = res.getString(R.string.notificationsLastUpdated, howMuchAgo);
+		String howMuchAgo = CafeApp.getDateOffsetString(diff);
+		String result = getResources().getString(R.string.notificationsLastUpdated, howMuchAgo);
 		statusText.setText(result);
 		statusText.setTextColor(android.R.color.tertiary_text_light);
 	}
@@ -162,36 +174,41 @@ public class NotificationsListFragment extends Fragment implements SwipeRefreshL
 		mListener = null;
 	}
 
+	FailableActionListener refreshListener = new FailableActionListener()
+	{
+		@Override
+		public void onSuccess(Object... params)
+		{
+			List<Notification> result = (List<Notification>) params[0];
+			adapter.updateList(result);
+
+			lastUpdatedTime = new Date();
+			setStatus(R.string.notificationsUpdatedJustNow);
+
+			refresher.setRefreshing(false);
+			emptyRefresher.setRefreshing(false);
+			isWorking = false;
+		}
+
+		@Override
+		public void onError(Object... params)
+		{
+			setStatusError(R.string.notificationsFetchingError);
+			refresher.setRefreshing(false);
+			emptyRefresher.setRefreshing(false);
+			isWorking = false;
+		}
+	};
+
 	@Override
 	public void onRefresh()
 	{
-		CafeApp.fetchNotifications(new FailableActionListener()
+		if (isWorking)
 		{
-			@Override
-			public void onSuccess(Object... params)
-			{
-				List<Notification> result = (List<Notification>) params[0];
-				ArrayAdapter<Notification> adapter = new ArrayAdapter<>(
-					NotificationsListFragment.this.getContext(),
-					android.R.layout.simple_list_item_1,
-					result);
-				notiesList.setAdapter(adapter);
-
-				lastUpdatedTime = new Date();
-				setStatus(R.string.notificationsUpdatedJustNow);
-
-				refresher.setRefreshing(false);
-				emptyRefresher.setRefreshing(false);
-			}
-
-			@Override
-			public void onError(Object... params)
-			{
-				setStatusError(R.string.notificationsFetchingError);
-				refresher.setRefreshing(false);
-				emptyRefresher.setRefreshing(false);
-			}
-		});
+			return;
+		}
+		isWorking = true;
+		CafeApp.fetchNotifications(refreshListener);
 	}
 
 	/**

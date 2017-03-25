@@ -70,7 +70,7 @@ public class MenuAdapter extends BaseAdapter
 		if (v == null)
 		{
 			LayoutInflater inflater = (LayoutInflater) ctx.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-			v = inflater.inflate(R.layout.menu_list_item, null);
+			v = inflater.inflate(R.layout.menu_list_item, parent, false);
 		}
 
 		Dish d = filteredData.get(position);
