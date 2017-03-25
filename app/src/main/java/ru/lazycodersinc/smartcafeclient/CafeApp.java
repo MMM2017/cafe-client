@@ -183,9 +183,18 @@ public class CafeApp extends Application
 		});
 	}
 
-	public static void readNotification(Notification n, FailableActionListener listener)
+	public static void readNotification(final Notification n, final FailableActionListener listener)
 	{
 		// TODO
+		app.net.post("/notification", null, new ApiCallListener()
+		{
+			@Override
+			public void onResult(ApiCallResult data)
+			{
+				n.read = true;
+				listener.onSuccess();
+			}
+		});
 	}
 
 	public static void readAll(FailableActionListener listener)

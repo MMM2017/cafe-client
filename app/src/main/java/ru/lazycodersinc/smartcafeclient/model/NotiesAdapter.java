@@ -22,6 +22,9 @@ public class NotiesAdapter extends BaseAdapter
 	private List<Notification> noties = new ArrayList<>();
 	private Context ctx;
 
+	private static final int BG_READ = 0x00000000;
+	private static final int BG_UNREAD = 0x4020a0f0;
+
 	public NotiesAdapter(Context context)
 	{
 		ctx = context;
@@ -32,6 +35,13 @@ public class NotiesAdapter extends BaseAdapter
 		noties.clear();
 		noties.addAll(newNoties);
 		notifyDataSetChanged();
+	}
+
+	public void readNoty(int notyIndex, View notyItemView)
+	{
+		// this check is needed due to reusing of views
+		if (((ViewHolder) notyItemView.getTag()).i == notyIndex)
+			notyItemView.setBackgroundColor(BG_READ);
 	}
 
 	@Override
@@ -68,6 +78,9 @@ public class NotiesAdapter extends BaseAdapter
 		h.message.setText(noty.text);
 		h.date.setText(formatDate(noty.createdAt));
 		h.ago.setText(createAgoText(noty.createdAt));
+		h.i = i;
+
+		v.setBackgroundColor(noty.read? BG_READ : BG_UNREAD);
 
 		return v;
 	}
@@ -98,6 +111,7 @@ public class NotiesAdapter extends BaseAdapter
 	{
 		TextView message, date, ago;
 		View item;
+		int i;
 		ViewHolder(View v)
 		{
 			item = v;

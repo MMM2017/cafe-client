@@ -11,10 +11,7 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
-import android.widget.Button;
-import android.widget.ListView;
-import android.widget.TextView;
+import android.widget.*;
 import ru.lazycodersinc.smartcafeclient.CafeApp;
 import ru.lazycodersinc.smartcafeclient.R;
 import ru.lazycodersinc.smartcafeclient.model.FailableActionListener;
@@ -96,6 +93,28 @@ public class NotificationsListFragment extends Fragment implements SwipeRefreshL
 			@Override
 			public void run() {
 				refresher.setRefreshing(true);
+			}
+		});
+
+		notiesList.setOnItemClickListener(new AdapterView.OnItemClickListener()
+		{
+			@Override
+			public void onItemClick(AdapterView<?> adapterView, final View view, final int i, long l)
+			{
+				// TODO: also open related order activity
+				CafeApp.readNotification((Notification) adapter.getItem(i), new FailableActionListener()
+				{
+					@Override
+					public void onSuccess(Object... params)
+					{
+						adapter.readNoty(i, view);
+					}
+					@Override
+					public void onError(Object... params)
+					{
+
+					}
+				});
 			}
 		});
 
