@@ -157,6 +157,9 @@ public class WaiterActivity extends AppCompatActivity
 
 			case R.id.nav_orders:
 				// switchLayout(SubLayout.ORDERS_LIST);
+				fMgr.beginTransaction()
+					.replace(R.id.content_officiant, OrdersListFragment.newInstance(""))
+					.commit();
 				break;
 		}
 

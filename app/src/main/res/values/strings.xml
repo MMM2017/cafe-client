@@ -57,12 +57,19 @@
         <item quantity="other">%1$d seconds</item>
     </plurals>
 
-    <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="orderStatusLabel">Status:</string>
     <string name="orderEntriesOverview">Entries: %1$d accepted, %2$d processing, %3$d done</string>
+    <string name="orderTableTextTemplate">Table %1$s</string>
+    <string name="orderStatusOpen">open</string>
+    <string name="orderStatusClosed">closed</string>
+    <string name="orderEmptyComment">(no comment left)</string>
 
     <string name="lorem">Lorem ipsum dolor sit amet, consectetur adipisicing elit.
         Architecto commodi ex iste qui, quibusdam quod saepe vitae voluptatem?
         Atque consectetur explicabo inventore praesentium vitae.
-        Aliquid aperiam consequuntur ipsam repudiandae voluptatibus!</string>
+        Aliquid aperiam consequuntur ipsam repudiandae voluptatibus!
+    </string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

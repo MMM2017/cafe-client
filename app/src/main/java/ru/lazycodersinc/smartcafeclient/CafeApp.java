@@ -4,10 +4,7 @@ import android.app.Application;
 import android.content.res.Resources;
 import org.json.JSONException;
 import org.json.JSONObject;
-import ru.lazycodersinc.smartcafeclient.model.Dish;
-import ru.lazycodersinc.smartcafeclient.model.FailableActionListener;
-import ru.lazycodersinc.smartcafeclient.model.Notification;
-import ru.lazycodersinc.smartcafeclient.model.User;
+import ru.lazycodersinc.smartcafeclient.model.*;
 import ru.lazycodersinc.smartcafeclient.network.ApiCallListener;
 import ru.lazycodersinc.smartcafeclient.network.ApiCallResult;
 import ru.lazycodersinc.smartcafeclient.network.NetworkManager;
@@ -203,6 +200,38 @@ public class CafeApp extends Application
 		// Warning: listener expects that List<Notification> will be returned at first param
 		// (just like in fetchNotifications) and it will contain all actual noties.
 		fetchNotifications(listener);
+	}
+
+	//
+	// ORDERS
+	//
+
+	public static void fetchOrders(final FailableActionListener listener)
+	{
+		app.net.get("/order", new ApiCallListener()
+		{
+			@Override
+			public void onResult(ApiCallResult data)
+			{
+				if (data.isOk())
+				{
+					// TODO
+					List<Order> test = new ArrayList<>();
+					for (int i = 0; i < 10; i++)
+					{
+						Order o = new Order();
+						o.table = "#" + i;
+						if (i % 4 == 0) o.comment = "OMG THAT'S A COMMENT WOW MUCH LONG SO MULTILINE WHEEEEEEEEEE EEEEEEEEE";
+						test.add(o);
+					}
+					listener.onSuccess(test);
+				}
+				else
+				{
+					listener.onError(data.status, data.result);
+				}
+			}
+		});
 	}
 
 	//

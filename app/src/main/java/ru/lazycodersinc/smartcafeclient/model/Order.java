@@ -1,5 +1,7 @@
 package ru.lazycodersinc.smartcafeclient.model;
 
+import ru.lazycodersinc.smartcafeclient.R;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -31,11 +33,11 @@ public class Order
 
 	public class Entry
 	{
-		Dish dish;
-		float amount = 1F;
-		String comment = "";
-		User cook;
-		EntryState state;
+		public Dish dish;
+		public float amount = 1F;
+		public String comment = "";
+		public User cook;
+		public EntryState state;
 
 		public Entry(Dish d, float amount)
 		{
@@ -62,6 +64,14 @@ public class Order
 
 	public enum State
 	{
-		OPEN, CLOSED
+		OPEN(R.string.orderStatusOpen),
+		CLOSED(R.string.orderStatusClosed);
+
+		public int stringId;
+
+		State(int strId)
+		{
+			stringId = strId;
+		}
 	}
 }

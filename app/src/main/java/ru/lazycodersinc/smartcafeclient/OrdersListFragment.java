@@ -4,9 +4,19 @@ import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.SearchView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ListView;
+import android.widget.Toast;
+import ru.lazycodersinc.smartcafeclient.model.FailableActionListener;
+import ru.lazycodersinc.smartcafeclient.model.Order;
+import ru.lazycodersinc.smartcafeclient.model.adapters.OrdersAdapter;
+
+import java.util.ArrayList;
+import java.util.List;
 
 
 /**
@@ -17,14 +27,8 @@ import android.view.ViewGroup;
  * Use the {@link OrdersListFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class OrdersListFragment extends Fragment
+public class OrdersListFragment extends RefreshableListFragment
 {
-	private static final String ARG_SEARCH_QUERY = "ordersListSearchQuery";
-
-	private String searchQuery;
-
-	private OnOrdersListUpdatedListener mListener;
-
 	public OrdersListFragment()
 	{
 		// Required empty public constructor
@@ -40,57 +44,84 @@ public class OrdersListFragment extends Fragment
 	public static OrdersListFragment newInstance(String query)
 	{
 		OrdersListFragment fragment = new OrdersListFragment();
-		Bundle args = new Bundle();
-		args.putString(ARG_SEARCH_QUERY, query);
-		fragment.setArguments(args);
+		fragment.provideValues(query);
 		return fragment;
 	}
 
 	@Override
 	public void onCreate(Bundle savedInstanceState)
 	{
-		super.onCreate(savedInstanceState);
-		if (getArguments() != null)
+		if (adapter == null)
 		{
-			searchQuery = getArguments().getString(ARG_SEARCH_QUERY);
+			adapter = new OrdersAdapter(getContext());
 		}
+		super.onCreate(savedInstanceState);
 	}
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
 	{
-		// Inflate the layout for this fragment
-		return inflater.inflate(R.layout.orders_list_layout, container, false);
-	}
+		View v = super.onCreateView(inflater, container, savedInstanceState);
+		setEmptyText(R.string.noOrders);
 
-	public void onListUpdated()
-	{
-		if (mListener != null)
+		listView.setOnItemClickListener(new AdapterView.OnItemClickListener()
 		{
-			mListener.onOrdersListUpdated();
-		}
+			@Override
+			public void onItemClick(AdapterView<?> adapterView, View view, int i, long l)
+			{
+				Order clicked = (Order) adapter.getItem(i);
+				// TODO
+				Toast.makeText(getContext(), clicked.table, Toast.LENGTH_SHORT).show();
+			}
+		});
+
+		return v;
 	}
 
 	@Override
 	public void onAttach(Context context)
 	{
 		super.onAttach(context);
-		if (context instanceof OnOrdersListUpdatedListener)
-		{
-			mListener = (OnOrdersListUpdatedListener) context;
-		}
-		else
-		{
-			throw new RuntimeException(context.toString()
-				+ " must implement OnOrdersListUpdatedListener");
-		}
+//		if (context instanceof OnOrdersListUpdatedListener)
+//		{
+//			mListener = (OnOrdersListUpdatedListener) context;
+//		}
+//		else
+//		{
+//			throw new RuntimeException(context.toString()
+//				+ " must implement OnOrdersListUpdatedListener");
+//		}
 	}
 
 	@Override
 	public void onDetach()
 	{
 		super.onDetach();
-		mListener = null;
+//		mListener = null;
+	}
+
+	@Override
+	public void onRefresh()
+	{
+		super.onRefresh();
+
+		CafeApp.fetchOrders(new FailableActionListener()
+		{
+			@Override
+			public void onSuccess(Object... params)
+			{
+				List<Order> result = (List<Order>) params[0];
+				((OrdersAdapter) adapter).updateContent(result);
+				setRefreshing(false);
+			}
+
+			@Override
+			public void onError(Object... params)
+			{
+				Toast.makeText(getContext(), "Error while refreshing!", Toast.LENGTH_SHORT).show();
+				setRefreshing(false);
+			}
+		});
 	}
 
 	/**
@@ -105,7 +136,6 @@ public class OrdersListFragment extends Fragment
 	 */
 	public interface OnOrdersListUpdatedListener
 	{
-		// TODO: Update argument type and name
 		void onOrdersListUpdated();
 	}
 }
